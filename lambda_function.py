@@ -4,25 +4,31 @@ This is a Python template for Alexa to get you building skills (conversations) q
 
 from __future__ import print_function
 
-soundboards = {
-    "after": "https://s3.amazonaws.com/samuelsoundboards/after2.mp3",
-    "what": "https://s3.amazonaws.com/samuelsoundboards/whatsthematter.mp3",
-    "shut": "https://s3.amazonaws.com/samuelsoundboards/stfu.mp3",
-    "name": "https://s3.amazonaws.com/samuelsoundboards/SamuelLJackson.mp3",
-    "baby": "https://s3.amazonaws.com/samuelsoundboards/baby.mp3",
-    "party": "https://s3.amazonaws.com/samuelsoundboards/party.mp3",
-    "burger": "https://s3.amazonaws.com/samuelsoundboards/burger.mp3",
-    "what": "https://s3.amazonaws.com/samuelsoundboards/what.mp3",
-    "complement": "https://s3.amazonaws.com/samuelsoundboards/say.mp3"
-}
 
+soundboards = {
+    "after" : "https://s3.amazonaws.com/samuelsoundboards/after2.mp3",
+    "what" : "https://s3.amazonaws.com/samuelsoundboards/whatsthematter.mp3",
+    "shut": "https://s3.amazonaws.com/samuelsoundboards/stfu.mp3",
+    "name" : "https://s3.amazonaws.com/samuelsoundboards/SamuelLJackson.mp3",
+    "baby" : "https://s3.amazonaws.com/samuelsoundboards/baby.mp3",
+    "party" : "https://s3.amazonaws.com/samuelsoundboards/party.mp3",
+    "burger" : "https://s3.amazonaws.com/samuelsoundboards/burger.mp3",
+    "what" : "https://s3.amazonaws.com/samuelsoundboards/what.mp3",
+    "complement" : "https://s3.amazonaws.com/samuelsoundboards/say.mp3",
+    "song" : "https://s3.amazonaws.com/samuelsoundboards/song.mp3",
+    "sleep" : "https://s3.amazonaws.com/samuelsoundboards/sleep.mp3",
+    "english" : "https://s3.amazonaws.com/samuelsoundboards/english.mp3",
+    "bitch" : "https://s3.amazonaws.com/samuelsoundboards/bitch.mp3",
+    "doubt" : "https://s3.amazonaws.com/samuelsoundboards/doubt.mp3",
+
+}
 
 # --------------- Helpers that build all of the responses ----------------------
 
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
     return {
         'outputSpeech': {
-            "ssml": "<speak><audio src='" + output + "' /> </speak>",
+            "ssml": "<speak><audio src='" + output +"' /></speak>",
             "type": "SSML"
         },
         'card': {
@@ -32,13 +38,12 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
         },
         'reprompt': {
             'outputSpeech': {
-                'type': 'PlainText',
-                'text': reprompt_text
+                "ssml": "<speak><audio src='" + reprompt_text +"' /></speak>",
+                "type": "SSML"
             }
         },
         'shouldEndSession': should_end_session
     }
-
 
 def build_response(session_attributes, speechlet_response):
     return {
@@ -49,6 +54,67 @@ def build_response(session_attributes, speechlet_response):
 
 
 # --------------- Functions that control the skill's behavior ------------------
+def get_yes_response():
+    """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
+    in your alexa skill in order for it to work.
+    """
+    session_attributes = {}
+    card_title = "yes"
+    speech_output = soundboards["doubt"]
+    reprompt_text = soundboards["baby"]
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+def get_english_response():
+    """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
+    in your alexa skill in order for it to work.
+    """
+    session_attributes = {}
+    card_title = "english"
+    speech_output = soundboards["english"]
+    reprompt_text = soundboards["baby"]
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+def get_jack_response():
+    """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
+    in your alexa skill in order for it to work.
+    """
+    session_attributes = {}
+    card_title = "jack"
+    speech_output = soundboards["bitch"]
+    reprompt_text = soundboards["baby"]
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+
+def get_story_response():
+    """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
+    in your alexa skill in order for it to work.
+    """
+    session_attributes = {}
+    card_title = "story"
+    speech_output = soundboards["sleep"]
+    reprompt_text = soundboards["baby"]
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+def get_song_response():
+    """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
+    in your alexa skill in order for it to work.
+    """
+    session_attributes = {}
+    card_title = "song"
+    speech_output = soundboards["song"]
+    reprompt_text = soundboards["baby"]
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
 def get_complement_response():
     """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
     in your alexa skill in order for it to work.
@@ -60,7 +126,6 @@ def get_complement_response():
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
-
 
 def get_food_response():
     """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
@@ -74,7 +139,6 @@ def get_food_response():
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
-
 def get_what_response():
     """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
     in your alexa skill in order for it to work.
@@ -87,7 +151,6 @@ def get_what_response():
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
-
 def get_greeting_response():
     """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
     in your alexa skill in order for it to work.
@@ -99,7 +162,6 @@ def get_greeting_response():
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
-
 
 def get_welcome_response():
     """ If we wanted to initialize the session to have some attributes we could
@@ -116,14 +178,14 @@ def get_welcome_response():
         card_title, speech_output, reprompt_text, should_end_session))
 
 
+
 def handle_session_end_request():
     card_title = "Session Ended"
-    speech_output = speech_output = soundboards["party"]
+    speech_output = soundboards["party"]
     # Setting this to true ends the session and exits the skill.
     should_end_session = True
     return build_response({}, build_speechlet_response(
-        card_title, speech_output, None, should_end_session))
-
+        card_title, speech_output, speech_output, should_end_session))
 
 # --------------- Events ------------------
 
@@ -134,6 +196,7 @@ def on_session_started(session_started_request, session):
     """
     # Add additional code here as needed
     pass
+
 
 
 def on_launch(launch_request, session):
@@ -161,6 +224,14 @@ def on_intent(intent_request, session):
         return get_what_response()
     elif intent_name == "complement":
         return get_complement_response()
+    elif intent_name == "song":
+        return get_song_response()
+    elif intent_name == "story":
+        return get_story_response()
+    elif intent_name == "jack":
+        return get_jack_response()
+    elif intent_name == "yes":
+        return get_yes_response()
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
         return handle_session_end_request()
     else:
@@ -204,3 +275,5 @@ def lambda_handler(event, context):
         return on_intent(event['request'], event['session'])
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
+
+print (handle_session_end_request())

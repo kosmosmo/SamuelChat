@@ -1,7 +1,7 @@
 import urllib.request
 from bs4 import BeautifulSoup
 import json,re,collections
-import bulk
+import bulk,upload
 class Scraper():
     def __init__(self):
         self.path = 'download/'
@@ -29,17 +29,22 @@ class Scraper():
             words = v.split(' ')
             for i in range(len(words)):
                 if words[i] and words[i][0].isalpha():
-                    words[i] = words[i][0].upper() + words[i][1:]
-            v = ''.join(words)
+                    words[i] = words[i].lower()
+            v = re.sub('[^A-Za-z0-9]+', '',''.join(words))
             url = self.dlurl+str(k)+self.format
             urllib.request.urlretrieve(url,self.path+v+self.format)
             print (v)
 
     def converter(self):
         bulk.bulkConverter(self.path,self.convert).main()
+    
+    def upload(self):
+        upload.s3upload(self.convert).run()
 
         
 
 
 a = Scraper()
-a.downloader(a.scraper('https://www.101soundboards.com/boards/10917'))
+a.downloader(a.scraper('https://www.101soundboards.com/boards/10336'))
+a.converter()
+a.upload()

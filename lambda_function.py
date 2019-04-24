@@ -3,8 +3,8 @@ This is a Python template for Alexa to get you building skills (conversations) q
 """
 
 from __future__ import print_function
+from comprehend import Comp
 import json,random
-import boto3
 
 map = 'soundmap.json'
 selfsentiment = 0
@@ -14,19 +14,27 @@ with open(map) as json_file:
     soundboards = json.load(json_file)
 
 intentmap = {
-             "negetive"      :["fat"],
-             "postive"       :["smartmf","hadsay"],
+             "NEGATIVE"      :["fat","afteryou","finished","respect","outface"],
+             "POSITIVE"      :["smartmf","hadsay","bigbrain"],
+             "MIXED"         :["dontwantthat","fresh"],
+             "NEUTRAL"       :["nottime","resources"],
              "fedup"         :["fat","afteryou","asking","stfu","rulesofengagement"],
              "greetingIntent":["whatsthematter","knockoff"],
              "foodIntent"    :["tastyburger","goodburger","hamburgers","kahunaburger","gourmet","ass"],
+             "foodIntentN"   :["ass","trueromance"],
              "selfIntent"    :["superflytnt","mushroom","righteousman","evilman"],
              "endIntent"     :["partysover","endthis"],
              "songIntent"    :["song","song2","song3"],
              "storyIntent"   :["story"],
              "mfkersIntent"  :["fks"],
-             "AMAZON.YesIntent":["nodoubt","possible"],
-             "AMAZON.NoIntent" :["nodoubt","possible"],
-
+             "loveIntent"    :["love2","love3"],
+             "jackIntent"    :["nasty"],
+             "doyouIntent"   :["yesido","yesimake","yesidid"],
+             "whoIntent"     :["vincent"],
+             "fall"          :["english","englishinwhat"],
+             "lostIntent"    :["youlost"],
+             "AMAZON.YesIntent":["nodoubt","possible","correct"],
+             "AMAZON.NoIntent" :["nodoubt","possible","correct"],
              }
 
 def randomPick(intent):
@@ -36,14 +44,11 @@ def randomPick(intent):
         intent = intent + 'N'
     sounds = intentmap[intent]
     rand = random.choice(sounds)
-    if prev or len(sounds) != 1:
+    if prev and len(sounds) != 1:
         while rand == prev:
             rand = random.choice(sounds)
     prev = rand
     return soundboards[rand]
-
-
-
 
 
 # --------------- Helpers that build all of the responses ----------------------
@@ -99,6 +104,18 @@ def build_response(session_attributes, speechlet_response):
 
 
 # --------------- Functions that control the skill's behavior ------------------
+def get_fall_response():
+    """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
+    in your alexa skill in order for it to work.
+    """
+    session_attributes = {}
+    card_title = "fall"
+    speech_output = randomPick("fall")
+    reprompt_text = soundboards["howwedoinbaby"]
+    should_end_session = False
+    return build_response(session_attributes, build_audio_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
 
 def get_intent_response(intent_name):
     """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
@@ -112,16 +129,23 @@ def get_intent_response(intent_name):
     return build_response(session_attributes, build_audio_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
-def get_you_response():
+def get_you_response(intent_slot):
     """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
     in your alexa skill in order for it to work.
     """
+
     session_attributes = {}
     card_title = "you"
-    speech_output = "This is a test message"
-    reprompt_text = "You never responded to the first test message. Sending another one."
+    ut = intent_slot[0] + ' you ' + intent_slot[1]
+    sen = Comp(ut).main()
+    if sen != None:
+        sentiment = sen['Sentiment']
+        speech_output = randomPick(sentiment)
+    else:
+        speech_output = randomPick("fall")
+    reprompt_text = soundboards["howwedoinbaby"]
     should_end_session = False
-    return build_response(session_attributes, build_speechlet_response(
+    return build_response(session_attributes, build_audio_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
 def get_welcome_response():
@@ -173,7 +197,15 @@ def on_intent(intent_request, session):
 
     intent = intent_request['intent']
     intent_name = intent_request['intent']['name']
-
+    intent_slot = ['','']
+    try:
+        slot = intent_request['intent']['slots']
+        if "value" in slot['person']:
+            intent_slot[0]=slot['person']['value']
+        elif "value" in slot['target']:
+            intent_slot[1] = slot['target']['value']
+    except:
+        pass
     # Dispatch to your skill's intent handlers
 
     if intent_name == "AMAZON.HelpIntent":
@@ -181,7 +213,9 @@ def on_intent(intent_request, session):
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
         return handle_session_end_request()
     elif intent_name == "youIntent":
-        return get_you_response()
+        return get_you_response(intent_slot)
+    elif intent_name == "AMAZON.FallbackIntent":
+        return get_fall_response()
     elif intent_name:
         return get_intent_response(intent_name)
     else:
@@ -225,3 +259,4 @@ def lambda_handler(event, context):
         return on_intent(event['request'], event['session'])
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
+

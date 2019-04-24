@@ -3,8 +3,10 @@ from botocore.client import Config
 import os,json,collections
 class s3upload():
     def __init__(self,direct):
-        self.id = 'AKIAIZ5HLWMG5Z2JY77Q'
-        self.key = ''
+        with open('aws.txt') as json_file:
+            data = json.load(json_file)
+        self.id = data['id']
+        self.key = data['key']
         self.bucket = 'samuelchat'
         self.direct = direct
 
@@ -27,7 +29,3 @@ class s3upload():
 
         with open('soundmap.json', 'w') as outfile:
             json.dump(res, outfile)
-
-
-
-a = s3upload('convert/').run()

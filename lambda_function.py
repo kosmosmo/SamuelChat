@@ -315,5 +315,3 @@ def lambda_handler(event, context):
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
 
-
-print (get_you_response(["coma","selma welss"]))

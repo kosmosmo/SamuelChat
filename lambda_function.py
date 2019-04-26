@@ -28,15 +28,24 @@ intentmap = {
              "storyIntent"   :["story"],
              "mfkersIntent"  :["fks"],
              "loveIntent"    :["love2","love3"],
-             "jackIntent"    :["nasty"],
+             "jackIntent"    :["look","look2"],
+             "nasty"         :["nasty"],
              "doyouIntent"   :["yesido","yesimake","yesidid"],
              "whoIntent"     :["vincent"],
-             "fall"          :["english","englishinwhat"],
+             "whatIntent"    :["saywhat","saywhat2"],
+             "english"       :["english","englishinwhat"],
+             "fall"          :["dontwantthat","fresh"],
+             "jokeIntent"    :["joke1","joke2","joke3","joke4","joke5"],
              "lostIntent"    :["youlost"],
+             "gotIntent"     :["got1","got2"],
              "AMAZON.YesIntent":["nodoubt","possible","correct"],
              "AMAZON.NoIntent" :["nodoubt","possible","correct"],
              }
 
+global nex,got,pintent
+nex = None
+got = False
+pintent = None
 def randomPick(intent):
     global prev
     global selfsentiment
@@ -104,6 +113,39 @@ def build_response(session_attributes, speechlet_response):
 
 
 # --------------- Functions that control the skill's behavior ------------------
+def get_joke_response():
+    """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
+    in your alexa skill in order for it to work.
+    """
+    global nex
+    if not nex:nex = intentmap["jokeIntent"]
+    pick = nex.pop(random.randint(0,len(nex)-1))
+    session_attributes = {}
+    card_title = "joke"
+    speech_output = soundboards[pick]
+    reprompt_text = soundboards["howwedoinbaby"]
+    should_end_session = False
+    return build_response(session_attributes, build_audio_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+def get_got_response():
+    """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
+    in your alexa skill in order for it to work.
+    """
+    session_attributes = {}
+    global got
+    if got == False:
+        speech_output = soundboards["got1"]
+    else:
+        speech_output = soundboards["got2"]
+    got = not got
+    card_title = "got"
+    reprompt_text = soundboards["howwedoinbaby"]
+    should_end_session = False
+    return build_response(session_attributes, build_audio_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+
 def get_fall_response():
     """ An example of a custom intent. Same structure as welcome message, just make sure to add this intent
     in your alexa skill in order for it to work.
@@ -123,9 +165,18 @@ def get_intent_response(intent_name):
     """
     session_attributes = {}
     card_title = "intent"
+    should_end_session = False
+    global pintent
+    if pintent == "jackIntent":
+        pintent = intent_name
+        speech_output = randomPick("nasty")
+        reprompt_text = soundboards["howwedoinbaby"]
+        return build_response(session_attributes, build_audio_response(
+            card_title, speech_output, reprompt_text, should_end_session))
+    pintent = intent_name
     speech_output = randomPick(intent_name)
     reprompt_text = soundboards["howwedoinbaby"]
-    should_end_session = False
+
     return build_response(session_attributes, build_audio_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
@@ -142,7 +193,7 @@ def get_you_response(intent_slot):
         sentiment = sen['Sentiment']
         speech_output = randomPick(sentiment)
     else:
-        speech_output = randomPick("fall")
+        speech_output = randomPick("english")
     reprompt_text = soundboards["howwedoinbaby"]
     should_end_session = False
     return build_response(session_attributes, build_audio_response(
@@ -216,6 +267,10 @@ def on_intent(intent_request, session):
         return get_you_response(intent_slot)
     elif intent_name == "AMAZON.FallbackIntent":
         return get_fall_response()
+    elif intent_name == "gotIntent":
+        return get_got_response()
+    elif intent_name == "jokeIntent":
+        return get_joke_response()
     elif intent_name:
         return get_intent_response(intent_name)
     else:
@@ -260,3 +315,5 @@ def lambda_handler(event, context):
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
 
+
+print (get_you_response(["coma","selma welss"]))

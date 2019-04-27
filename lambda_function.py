@@ -34,7 +34,8 @@ intentmap = {
              "whoIntent"     :["vincent"],
              "whatIntent"    :["saywhat","saywhat2"],
              "english"       :["english","englishinwhat"],
-             "fall"          :["dontwantthat","fresh"],
+             "fall"          :["mhm"],
+             "laugthIntent"  :["laugth"],
              "jokeIntent"    :["joke1","joke2","joke3","joke4","joke5"],
              "lostIntent"    :["youlost"],
              "gotIntent"     :["got1","got2"],
@@ -314,4 +315,5 @@ def lambda_handler(event, context):
         return on_intent(event['request'], event['session'])
     elif event['request']['type'] == "SessionEndedRequest":
         return on_session_ended(event['request'], event['session'])
+
 
